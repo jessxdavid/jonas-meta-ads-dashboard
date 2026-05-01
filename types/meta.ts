@@ -44,6 +44,7 @@ export interface Creative {
   videoUrl?: string;
   videoPosterUrl?: string;
   permalinkUrl?: string;
+  previewIframeUrl?: string;
   format: "image" | "video" | "carousel";
   daily: Insight[];
 }

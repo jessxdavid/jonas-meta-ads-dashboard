@@ -173,6 +173,8 @@ interface RawAd {
   adset_id: string;
   campaign_id: string;
   name: string;
+  preview_shareable_link?: string;
+  previews?: { data?: Array<{ body?: string }> };
   creative?: {
     thumbnail_url?: string;
     image_url?: string;
@@ -247,8 +249,15 @@ const CAMPAIGN_FIELDS =
   "id,name,status,objective,daily_budget,lifetime_budget,spend_cap,start_time,stop_time";
 const ADSET_FIELDS = "id,campaign_id,name,status,targeting{age_min,age_max,geo_locations,flexible_spec}";
 const AD_FIELDS =
-  "id,adset_id,campaign_id,name,creative{thumbnail_url,image_url,video_id,object_story_spec}";
+  "id,adset_id,campaign_id,name,preview_shareable_link,previews.ad_format(MOBILE_FEED_STANDARD),creative{thumbnail_url,image_url,video_id,object_story_spec}";
 const VIDEO_FIELDS = "source,picture,permalink_url";
+
+function extractIframeSrc(body?: string): string | undefined {
+  if (!body) return undefined;
+  const m = body.match(/src="([^"]+)"/);
+  if (!m) return undefined;
+  return m[1].replace(/&amp;/g, "&");
+}
 const INSIGHT_FIELDS = "spend,impressions,clicks,actions,action_values";
 
 interface AccountInfo {
@@ -418,6 +427,7 @@ export async function getLiveCreatives(range: DateRange): Promise<Creative[]> {
     return adsRaw.map((a) => {
       const videoId = a.creative?.video_id;
       const video = videoId ? videoById.get(videoId) : undefined;
+      const previewIframeUrl = extractIframeSrc(a.previews?.data?.[0]?.body);
       return {
         id: a.id,
         adSetId: a.adset_id,
@@ -427,7 +437,8 @@ export async function getLiveCreatives(range: DateRange): Promise<Creative[]> {
         imageUrl: a.creative?.image_url,
         videoUrl: video?.source,
         videoPosterUrl: video?.picture ?? a.creative?.image_url ?? a.creative?.thumbnail_url,
-        permalinkUrl: video?.permalink_url,
+        permalinkUrl: video?.permalink_url ?? a.preview_shareable_link,
+        previewIframeUrl,
         format: detectFormat(a.creative),
         daily: (dailyByAd.get(a.id) ?? []).sort(sortByDate),
       };

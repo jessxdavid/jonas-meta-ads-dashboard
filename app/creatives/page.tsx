@@ -30,8 +30,9 @@ function CreativePreview({ creative }: { creative: CreativeRow }) {
   const isVideo = creative.format === "video";
   const poster = creative.videoPosterUrl ?? creative.imageUrl ?? creative.thumbnailUrl;
   const stillImage = creative.imageUrl ?? creative.thumbnailUrl;
+  const playable = creative.videoUrl || creative.previewIframeUrl;
 
-  if (isVideo && creative.videoUrl && playing) {
+  if (playing && creative.videoUrl) {
     return (
       <video
         src={creative.videoUrl}
@@ -40,6 +41,17 @@ function CreativePreview({ creative }: { creative: CreativeRow }) {
         autoPlay
         playsInline
         className="absolute inset-0 h-full w-full bg-black object-contain"
+      />
+    );
+  }
+  if (playing && creative.previewIframeUrl) {
+    return (
+      <iframe
+        src={creative.previewIframeUrl}
+        title={creative.name}
+        className="absolute inset-0 h-full w-full border-0 bg-white"
+        allow="autoplay; encrypted-media"
+        allowFullScreen
       />
     );
   }
@@ -60,7 +72,7 @@ function CreativePreview({ creative }: { creative: CreativeRow }) {
           No preview
         </div>
       )}
-      {isVideo && creative.videoUrl && (
+      {isVideo && playable && (
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -74,7 +86,7 @@ function CreativePreview({ creative }: { creative: CreativeRow }) {
           </span>
         </button>
       )}
-      {isVideo && !creative.videoUrl && creative.permalinkUrl && (
+      {isVideo && !playable && creative.permalinkUrl && (
         <a
           href={creative.permalinkUrl}
           target="_blank"

@@ -165,6 +165,7 @@ export interface CreativesPayload {
     videoUrl?: string;
     videoPosterUrl?: string;
     permalinkUrl?: string;
+    previewIframeUrl?: string;
     format: Creative["format"];
     totals: MetricTotals;
   }>;
@@ -268,6 +269,7 @@ export async function getCreativesPayload(range: DateRange): Promise<CreativesPa
       videoUrl: cr.videoUrl,
       videoPosterUrl: cr.videoPosterUrl,
       permalinkUrl: cr.permalinkUrl,
+      previewIframeUrl: cr.previewIframeUrl,
       format: cr.format,
       totals: totalsFromInsights(filterInsights(cr.daily, range.since, range.until)),
     })),
