@@ -178,6 +178,10 @@ function buildDailyInsights(profile: CampaignProfile): Insight[] {
     const dailyRoas = Math.max(0.2, profile.targetRoas * roasNoise);
     const revenue = spend * dailyRoas;
     const conversions = Math.max(0, Math.round(revenue / 65));
+    // Synthetic follower count: ~25-40% of clicks become followers on engagement
+    // campaigns. Real value comes from Meta's actions[follow] in live mode.
+    const followerRate = 0.25 + rng() * 0.15;
+    const followers = Math.max(0, Math.round(clicks * followerRate));
 
     insights.push({
       date,
@@ -186,6 +190,7 @@ function buildDailyInsights(profile: CampaignProfile): Insight[] {
       clicks,
       conversions,
       revenue: Number(revenue.toFixed(2)),
+      followers,
     });
   }
   return insights;
@@ -253,6 +258,7 @@ function buildAdSets(campaigns: Campaign[]): AdSet[] {
         clicks: Math.round(d.clicks * ratio),
         conversions: Math.round(d.conversions * ratio),
         revenue: Number((d.revenue * ratio).toFixed(2)),
+        followers: Math.round(d.followers * ratio),
       }));
       sets.push({
         id: `23856000000${String(counter).padStart(6, "0")}`,
@@ -306,6 +312,7 @@ function buildCreatives(adSets: AdSet[]): Creative[] {
         clicks: Math.round(d.clicks * ratio),
         conversions: Math.round(d.conversions * ratio),
         revenue: Number((d.revenue * ratio).toFixed(2)),
+        followers: Math.round(d.followers * ratio),
       }));
       creatives.push({
         id: `23857000000${String(id).padStart(6, "0")}`,

@@ -85,6 +85,18 @@ const PURCHASE_TYPES = new Set([
   "web_in_store_purchase",
 ]);
 
+// Meta exposes follower-style actions under several keys depending on objective
+// and placement. We aggregate any of them as "followers gained" since users
+// optimize for engagement on follower campaigns.
+const FOLLOW_TYPES = new Set([
+  "follow",
+  "onsite_conversion.follow",
+  "omni_follow",
+  "instagram_follow",
+  "page_engagement",
+  "onsite_conversion.post_save",
+]);
+
 interface ActionEntry {
   action_type: string;
   value: string;
@@ -95,6 +107,21 @@ function sumPurchases(actions?: ActionEntry[]): number {
   const omni = actions.find((a) => a.action_type === "omni_purchase");
   if (omni) return num(omni.value);
   return actions.filter((a) => PURCHASE_TYPES.has(a.action_type)).reduce((s, a) => s + num(a.value), 0);
+}
+
+function sumFollows(actions?: ActionEntry[]): number {
+  if (!actions || actions.length === 0) return 0;
+  // Prefer specific follow types over the broader page_engagement bucket so
+  // we don't double-count likes + comments as follows. We pick in priority:
+  //   omni_follow > onsite_conversion.follow > follow > instagram_follow > page_engagement
+  const priority = ["omni_follow", "onsite_conversion.follow", "follow", "instagram_follow"];
+  for (const type of priority) {
+    const hit = actions.find((a) => a.action_type === type);
+    if (hit) return num(hit.value);
+  }
+  // Fallback: page_engagement (proxy for engagement campaigns when no specific follow row exists)
+  const pe = actions.find((a) => a.action_type === "page_engagement");
+  return pe ? num(pe.value) : 0;
 }
 
 interface InsightRow {
@@ -123,6 +150,7 @@ function rowToInsight(r: InsightRow): Insight {
     clicks: num(r.clicks),
     conversions: sumPurchases(r.actions),
     revenue: sumPurchases(r.action_values),
+    followers: sumFollows(r.actions),
   };
 }
 

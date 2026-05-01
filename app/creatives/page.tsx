@@ -12,7 +12,6 @@ import { useDashboardFetch } from "@/lib/use-fetch";
 import {
   formatCurrency,
   formatNumber,
-  formatPercent,
   formatRoas,
 } from "@/lib/format";
 import type { CreativesPayload } from "@/lib/meta-api";
@@ -221,12 +220,14 @@ export default function CreativesPage() {
                           <div className="font-mono text-white">{formatCurrency(c.totals.spend, { compact: true })}</div>
                         </div>
                         <div>
-                          <div className="text-[var(--color-text-muted)]">Impr.</div>
-                          <div className="font-mono text-white">{formatNumber(c.totals.impressions, { compact: true })}</div>
+                          <div className="text-[var(--color-text-muted)]">Followers</div>
+                          <div className="font-mono text-white">{formatNumber(c.totals.followers, { compact: true })}</div>
                         </div>
                         <div>
-                          <div className="text-[var(--color-text-muted)]">CTR</div>
-                          <div className="font-mono text-white">{formatPercent(c.totals.ctr)}</div>
+                          <div className="text-[var(--color-text-muted)]">$/Follower</div>
+                          <div className="font-mono text-white">
+                            {c.totals.followers > 0 ? formatCurrency(c.totals.costPerFollower) : "—"}
+                          </div>
                         </div>
                         <div>
                           <div className="text-[var(--color-text-muted)]">ROAS</div>

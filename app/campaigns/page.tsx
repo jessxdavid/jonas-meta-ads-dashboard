@@ -17,7 +17,7 @@ import {
 } from "@/lib/format";
 import type { CampaignsPayload } from "@/lib/meta-api";
 
-type SortKey = "name" | "spend" | "impressions" | "clicks" | "ctr" | "cpc" | "roas";
+type SortKey = "name" | "spend" | "impressions" | "clicks" | "ctr" | "cpc" | "roas" | "followers" | "costPerFollower";
 type SortDir = "asc" | "desc";
 
 export default function CampaignsPage() {
@@ -119,6 +119,8 @@ export default function CampaignsPage() {
                       <SortHeader label="Clicks" k="clicks" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
                       <SortHeader label="CTR" k="ctr" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
                       <SortHeader label="CPC" k="cpc" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
+                      <SortHeader label="Followers" k="followers" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
+                      <SortHeader label="Cost / Follower" k="costPerFollower" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
                       <SortHeader label="ROAS" k="roas" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} align="right" />
                     </tr>
                   </thead>
@@ -149,6 +151,12 @@ export default function CampaignsPage() {
                         </td>
                         <td className="px-5 py-3 text-right font-mono text-white">
                           {formatCurrency(c.totals.cpc)}
+                        </td>
+                        <td className="px-5 py-3 text-right font-mono text-white">
+                          {formatNumber(c.totals.followers)}
+                        </td>
+                        <td className="px-5 py-3 text-right font-mono text-white">
+                          {c.totals.followers > 0 ? formatCurrency(c.totals.costPerFollower) : "—"}
                         </td>
                         <td
                           className={clsx(

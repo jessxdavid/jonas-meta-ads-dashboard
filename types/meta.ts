@@ -9,6 +9,7 @@ export interface Insight {
   clicks: number;
   conversions: number;
   revenue: number;
+  followers: number;
 }
 
 export interface Campaign {
@@ -117,8 +118,10 @@ export interface MetricTotals {
   clicks: number;
   conversions: number;
   revenue: number;
+  followers: number;
   ctr: number;
   cpc: number;
   cpm: number;
   roas: number;
+  costPerFollower: number;
 }

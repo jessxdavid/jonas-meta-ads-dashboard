@@ -76,9 +76,10 @@ function totalsFromInsights(insights: Insight[]): MetricTotals {
       acc.clicks += i.clicks;
       acc.conversions += i.conversions;
       acc.revenue += i.revenue;
+      acc.followers += i.followers ?? 0;
       return acc;
     },
-    { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0 },
+    { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0, followers: 0 },
   );
   return {
     ...t,
@@ -86,6 +87,7 @@ function totalsFromInsights(insights: Insight[]): MetricTotals {
     cpc: t.clicks > 0 ? t.spend / t.clicks : 0,
     cpm: t.impressions > 0 ? (t.spend / t.impressions) * 1000 : 0,
     roas: t.spend > 0 ? t.revenue / t.spend : 0,
+    costPerFollower: t.followers > 0 ? t.spend / t.followers : 0,
   };
 }
 
@@ -100,8 +102,9 @@ function aggregateAcrossCampaigns(campaigns: Campaign[], range: DateRange): Insi
         existing.clicks += d.clicks;
         existing.conversions += d.conversions;
         existing.revenue += d.revenue;
+        existing.followers += d.followers ?? 0;
       } else {
-        byDate.set(d.date, { ...d });
+        byDate.set(d.date, { ...d, followers: d.followers ?? 0 });
       }
     }
   }
