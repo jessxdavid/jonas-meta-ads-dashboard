@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { Film, Image as ImageIcon, Layers } from "lucide-react";
+import { ExternalLink, Film, Image as ImageIcon, Layers, Play } from "lucide-react";
 import clsx from "clsx";
 import { PageShell } from "@/components/PageShell";
 import { GridSkeleton } from "@/components/Skeleton";
@@ -22,6 +22,74 @@ const FORMAT_ICON: Record<string, React.ElementType> = {
   video: Film,
   carousel: Layers,
 };
+
+type CreativeRow = CreativesPayload["creatives"][number];
+
+function CreativePreview({ creative }: { creative: CreativeRow }) {
+  const [playing, setPlaying] = useState(false);
+  const isVideo = creative.format === "video";
+  const poster = creative.videoPosterUrl ?? creative.imageUrl ?? creative.thumbnailUrl;
+  const stillImage = creative.imageUrl ?? creative.thumbnailUrl;
+
+  if (isVideo && creative.videoUrl && playing) {
+    return (
+      <video
+        src={creative.videoUrl}
+        poster={poster}
+        controls
+        autoPlay
+        playsInline
+        className="absolute inset-0 h-full w-full bg-black object-contain"
+      />
+    );
+  }
+
+  return (
+    <>
+      {(isVideo ? poster : stillImage) ? (
+        <Image
+          src={isVideo ? poster : stillImage}
+          alt={creative.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition group-hover:scale-105"
+          unoptimized
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg)] text-xs text-[var(--color-text-muted)]">
+          No preview
+        </div>
+      )}
+      {isVideo && creative.videoUrl && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setPlaying(true);
+          }}
+          aria-label={`Play ${creative.name}`}
+          className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/50"
+        >
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition group-hover:scale-110">
+            <Play size={24} fill="currentColor" />
+          </span>
+        </button>
+      )}
+      {isVideo && !creative.videoUrl && creative.permalinkUrl && (
+        <a
+          href={creative.permalinkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open ${creative.name} on Facebook`}
+          className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/50"
+        >
+          <span className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-black shadow-lg">
+            <ExternalLink size={14} /> Watch on Facebook
+          </span>
+        </a>
+      )}
+    </>
+  );
+}
 
 export default function CreativesPage() {
   const { data, loading, error, refetch } = useDashboardFetch<CreativesPayload>("/api/creatives");
@@ -108,24 +176,30 @@ export default function CreativesPage() {
                     className="group overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] transition hover:border-[var(--color-border-strong)]"
                   >
                     <div className="relative aspect-square w-full overflow-hidden bg-[var(--color-bg)]">
-                      <Image
-                        src={c.thumbnailUrl}
-                        alt={c.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition group-hover:scale-105"
-                        unoptimized
-                      />
-                      <div className="absolute left-3 top-3">
+                      <CreativePreview creative={c} />
+                      <div className="pointer-events-none absolute left-3 top-3">
                         <PerformanceBadge tier={tier} />
                       </div>
-                      <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
+                      <div className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
                         <Icon size={12} />
                         {c.format}
                       </div>
                     </div>
                     <div className="p-4">
-                      <div className="mb-1 truncate text-sm font-semibold text-white">{c.name}</div>
+                      <div className="mb-1 flex items-start justify-between gap-2">
+                        <div className="truncate text-sm font-semibold text-white">{c.name}</div>
+                        {c.permalinkUrl && (
+                          <a
+                            href={c.permalinkUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-[var(--color-text-muted)] hover:text-white"
+                            aria-label="Open on Facebook"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
                       <div className="mb-3 truncate text-xs text-[var(--color-text-secondary)]">
                         {c.campaignName}
                       </div>

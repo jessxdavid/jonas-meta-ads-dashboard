@@ -40,6 +40,10 @@ export interface Creative {
   campaignId: string;
   name: string;
   thumbnailUrl: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  videoPosterUrl?: string;
+  permalinkUrl?: string;
   format: "image" | "video" | "carousel";
   daily: Insight[];
 }

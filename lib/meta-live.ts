@@ -184,6 +184,13 @@ interface RawAd {
   };
 }
 
+interface RawVideo {
+  id: string;
+  source?: string;
+  picture?: string;
+  permalink_url?: string;
+}
+
 function summarizeTargeting(t: RawAdSet["targeting"]): string {
   if (!t) return "—";
   const parts: string[] = [];
@@ -241,6 +248,7 @@ const CAMPAIGN_FIELDS =
 const ADSET_FIELDS = "id,campaign_id,name,status,targeting{age_min,age_max,geo_locations,flexible_spec}";
 const AD_FIELDS =
   "id,adset_id,campaign_id,name,creative{thumbnail_url,image_url,video_id,object_story_spec}";
+const VIDEO_FIELDS = "source,picture,permalink_url";
 const INSIGHT_FIELDS = "spend,impressions,clicks,actions,action_values";
 
 interface AccountInfo {
@@ -385,15 +393,45 @@ export async function getLiveCreatives(range: DateRange): Promise<Creative[]> {
       arr.push(rowToInsight(r));
       dailyByAd.set(r.ad_id, arr);
     }
-    return adsRaw.map((a) => ({
-      id: a.id,
-      adSetId: a.adset_id,
-      campaignId: a.campaign_id,
-      name: a.name,
-      thumbnailUrl: a.creative?.thumbnail_url ?? a.creative?.image_url ?? "",
-      format: detectFormat(a.creative),
-      daily: (dailyByAd.get(a.id) ?? []).sort(sortByDate),
-    }));
+
+    const videoIds = Array.from(
+      new Set(adsRaw.map((a) => a.creative?.video_id).filter((v): v is string => Boolean(v))),
+    );
+    const videoById = new Map<string, RawVideo>();
+    if (videoIds.length > 0) {
+      const accessToken = c.accessToken;
+      const CHUNK = 50;
+      for (let i = 0; i < videoIds.length; i += CHUNK) {
+        const chunk = videoIds.slice(i, i + CHUNK);
+        const url = buildUrl("/", { ids: chunk.join(","), fields: VIDEO_FIELDS, access_token: accessToken });
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) continue;
+          const json = (await res.json()) as Record<string, RawVideo>;
+          for (const [id, v] of Object.entries(json)) videoById.set(id, v);
+        } catch {
+          // best-effort: skip on error so other creatives still render
+        }
+      }
+    }
+
+    return adsRaw.map((a) => {
+      const videoId = a.creative?.video_id;
+      const video = videoId ? videoById.get(videoId) : undefined;
+      return {
+        id: a.id,
+        adSetId: a.adset_id,
+        campaignId: a.campaign_id,
+        name: a.name,
+        thumbnailUrl: a.creative?.thumbnail_url ?? a.creative?.image_url ?? "",
+        imageUrl: a.creative?.image_url,
+        videoUrl: video?.source,
+        videoPosterUrl: video?.picture ?? a.creative?.image_url ?? a.creative?.thumbnail_url,
+        permalinkUrl: video?.permalink_url,
+        format: detectFormat(a.creative),
+        daily: (dailyByAd.get(a.id) ?? []).sort(sortByDate),
+      };
+    });
   });
 }
 

@@ -161,6 +161,10 @@ export interface CreativesPayload {
     campaignName: string;
     name: string;
     thumbnailUrl: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    videoPosterUrl?: string;
+    permalinkUrl?: string;
     format: Creative["format"];
     totals: MetricTotals;
   }>;
@@ -260,6 +264,10 @@ export async function getCreativesPayload(range: DateRange): Promise<CreativesPa
       campaignName: campaignName(cr.campaignId),
       name: cr.name,
       thumbnailUrl: cr.thumbnailUrl,
+      imageUrl: cr.imageUrl,
+      videoUrl: cr.videoUrl,
+      videoPosterUrl: cr.videoPosterUrl,
+      permalinkUrl: cr.permalinkUrl,
       format: cr.format,
       totals: totalsFromInsights(filterInsights(cr.daily, range.since, range.until)),
     })),

@@ -313,6 +313,12 @@ function buildCreatives(adSets: AdSet[]): Creative[] {
         campaignId: set.campaignId,
         name: tmpl.name,
         thumbnailUrl: tmpl.thumb,
+        imageUrl: tmpl.thumb,
+        videoUrl:
+          tmpl.format === "video"
+            ? "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            : undefined,
+        videoPosterUrl: tmpl.format === "video" ? tmpl.thumb : undefined,
         format: tmpl.format,
         daily,
       });
