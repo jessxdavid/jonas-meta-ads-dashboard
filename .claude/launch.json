@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "meta-ads",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 4242,
+      "cwd": "E:\\website\\meta-ads-dashboard"
+    }
+  ]
+}

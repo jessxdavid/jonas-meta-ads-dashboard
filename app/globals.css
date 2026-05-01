@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0d0d0d;
+  --color-card: #161616;
+  --color-card-hover: #1c1c1c;
+  --color-border: #282828;
+  --color-border-strong: #3a3a3a;
+
+  --color-accent: #c8714a;
+  --color-accent-hover: #d68660;
+  --color-accent-soft: rgba(200, 113, 74, 0.12);
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8c8c8c;
+  --color-text-muted: #5c5c5c;
+
+  --color-positive: #4ade80;
+  --color-positive-soft: rgba(74, 222, 128, 0.12);
+  --color-negative: #f87171;
+  --color-negative-soft: rgba(248, 113, 113, 0.12);
+  --color-neutral: #94a3b8;
+  --color-neutral-soft: rgba(148, 163, 184, 0.12);
+  --color-warning: #fbbf24;
+  --color-warning-soft: rgba(251, 191, 36, 0.12);
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+.font-mono,
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-card) 0%,
+    var(--color-card-hover) 50%,
+    var(--color-card) 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-default-tooltip {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+}
