@@ -13,6 +13,7 @@ import {
   LineChart,
   Flame,
   Filter,
+  Sparkles,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/fatigue", label: "Fatigue", icon: Flame },
   { href: "/audiences", label: "Audiences", icon: Users },
   { href: "/budget", label: "Budget", icon: Wallet },
+  { href: "/do-not-click", label: "Do Not Click", icon: Sparkles },
 ];
 
 export function Sidebar() {
