@@ -36,10 +36,10 @@ export function DeviceDonut({ data }: { data: DeviceSlice[] }) {
               border: "1px solid #282828",
               borderRadius: 8,
             }}
-            formatter={(value: number, _name: string, props: { payload: { pct: number } }) => [
-              `${formatCurrency(value)} (${formatPercent(props.payload.pct, 1)})`,
-              "Spend",
-            ]}
+            formatter={(value: number, _name, props) => {
+              const pct = (props?.payload as { pct?: number } | undefined)?.pct ?? 0;
+              return [`${formatCurrency(value)} (${formatPercent(pct, 1)})`, "Spend"];
+            }}
           />
           <Pie
             data={chartData}
